@@ -290,6 +290,7 @@ class DenseCorrespondenceTraining(object):
         for epoch in range(50):  # loop over the dataset multiple times
 
             for i, data in enumerate(self._data_loader, 0):
+                st()
                 loss_current_iteration += 1
                 start_iter = time.time()
 
