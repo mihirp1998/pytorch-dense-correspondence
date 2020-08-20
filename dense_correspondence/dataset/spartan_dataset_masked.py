@@ -8,6 +8,8 @@ import random
 import copy
 
 import torch
+import ipdb
+st = ipdb.set_trace
 
 # note that this is the torchvision provided by the warmspringwinds
 # pytorch-segmentation-detection repo. It is a fork of pytorch/vision
@@ -171,7 +173,6 @@ class SpartanDataset(DenseCorrespondenceDataset):
 
         self.logs_root_path = utils.convert_data_relative_path_to_absolute_path(config['logs_root_path'], assert_path_exists=True)
 
-
         self._single_object_scene_dict = dict()
 
         prefix = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence',
@@ -201,7 +202,6 @@ class SpartanDataset(DenseCorrespondenceDataset):
             for key, val in self._multi_object_scene_dict.iteritems():
                 for item in multi_object_scene_config[key]:
                     val.append(item)
-
         self._config = dict()
         self._config["logs_root_path"] = config['logs_root_path']
         self._config["single_object"] = self._single_object_scene_dict

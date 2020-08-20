@@ -3,8 +3,17 @@ import os
 import cv2
 import numpy as np
 import copy
+from config.params import *
+import logging
+
+os.environ['DC_SOURCE_DIR'] = DIR_PROJ
+os.environ['DC_DATA_DIR'] = "{}/pdc".format(DIR_DATA)
+import ipdb
+st = ipdb.set_trace
+# st()
 
 import dense_correspondence_manipulation.utils.utils as utils
+
 dc_source_dir = utils.getDenseCorrespondenceSourceDir()
 sys.path.append(dc_source_dir)
 sys.path.append(os.path.join(dc_source_dir, "dense_correspondence", "correspondence_tools"))
@@ -33,7 +42,7 @@ EVAL_CONFIG = utils.getDictFromYamlFilename(eval_config_filename)
 
 
 
-LOAD_SPECIFIC_DATASET = False
+LOAD_SPECIFIC_DATASET = True
 
 class HeatmapVisualization(object):
     """
@@ -69,7 +78,6 @@ class HeatmapVisualization(object):
 
         self._dataset = None
         self._network_reticle_color = dict()
-
         for idx, network_name in enumerate(self._config["networks"]):
             dcn = self._dce.load_network_from_config(network_name)
             dcn.eval()
@@ -86,12 +94,12 @@ class HeatmapVisualization(object):
 
     def load_specific_dataset(self):
         dataset_config_filename = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence',
-                                            'dataset', 'composite', 'hats_3_demo_composite.yaml')
+                                            'dataset', 'composite', 'caterpillar_only_9.yaml')
 
         # dataset_config_filename = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config',
         #                                        'dense_correspondence',
         #                                        'dataset', 'composite', '4_shoes_all.yaml')
-
+        # st()
         dataset_config = utils.getDictFromYamlFilename(dataset_config_filename)
         self._dataset = SpartanDataset(config=dataset_config)
 
@@ -99,6 +107,7 @@ class HeatmapVisualization(object):
         """
         Gets a pair of random images for different scenes of the same object
         """
+        # st()
         object_id = self._dataset.get_random_object_id()
         # scene_name_a = "2018-04-10-16-02-59"
         # scene_name_b = scene_name_a
@@ -217,7 +226,7 @@ class HeatmapVisualization(object):
         self.rgb_2_tensor = self._dataset.rgb_image_to_tensor(self.img2_pil)
         self.img1_gray = cv2.cvtColor(self.img1, cv2.COLOR_RGB2GRAY) / 255.0
         self.img2_gray = cv2.cvtColor(self.img2, cv2.COLOR_RGB2GRAY) / 255.0
-
+        # st()
         cv2.imshow('source', self.img1)
         cv2.imshow('target', self.img2)
 

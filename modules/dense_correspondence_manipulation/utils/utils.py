@@ -13,6 +13,8 @@ import fnmatch
 import random
 import torch
 import datetime
+import ipdb
+st =ipdb.set_trace
 from PIL import Image
 
 
@@ -131,6 +133,7 @@ def get_defaults_config():
 
 
 def add_dense_correspondence_to_python_path():
+    # st()
     dc_source_dir = getDenseCorrespondenceSourceDir()
     sys.path.append(dc_source_dir)
 
@@ -170,7 +173,7 @@ def convert_data_relative_path_to_absolute_path(path, assert_path_exists=False):
     :return:
     :rtype:
     """
-
+    # st()
     if os.path.isabs(path):
         return path
 
@@ -181,8 +184,8 @@ def convert_data_relative_path_to_absolute_path(path, assert_path_exists=False):
             # try a backwards compatibility check for old style
             # "code/data_volume/pdc/<path>" rather than <path>
             start_path = "code/data_volume/pdc"
-            rel_path = os.path.relpath(path, start_path)
-            full_path = os.path.join(get_data_dir(), rel_path)
+            # rel_path = os.path.relpath(path, start_path)
+            full_path = os.path.join(get_data_dir(),start_path,path)
         
         if not os.path.exists(full_path):
             raise ValueError("full_path %s not found, you asserted that path exists" %(full_path))
