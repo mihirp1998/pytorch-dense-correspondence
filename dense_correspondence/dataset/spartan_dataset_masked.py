@@ -28,7 +28,14 @@ import dense_correspondence.correspondence_tools.correspondence_augmentation as 
 
 from dense_correspondence.dataset.scene_structure import SceneStructure
 
-
+'''
+self._single_object_scene_dict
+{'caterpillar': {'logs_root_path': 'logs_proto', 'test': ['2018-04-16-14-46-36', '2018-04
+-16-14-40-25', '2018-04-16-14-42-26', '2018-04-16-14-44-53'], 'train': ['2018-04-16-14-25
+-19', '2018-04-16-14-40-25', '2018-04-16-14-42-26', '2018-04-16-14-44-53'], 'evaluation_l
+abeled_data_path': ['evaluation_labeled_data/caterpillar_cross_scene_labels.yaml'], 'obje
+ct_id': 'caterpillar'}}
+'''
 
 class SpartanDatasetDataType:
     SINGLE_OBJECT_WITHIN_SCENE = 0
@@ -85,7 +92,7 @@ class SpartanDataset(DenseCorrespondenceDataset):
             self.sample_matches_only_off_mask = True
 
         self._verbose = verbose
-
+        # st()
         if config is not None:
             self._setup_scene_data(config)
         elif config_expanded is not None:
@@ -121,7 +128,7 @@ class SpartanDataset(DenseCorrespondenceDataset):
 
 
         data_load_type = self._get_data_load_type()
-
+        st()
         # Case 0: Same scene, same object
         if data_load_type == SpartanDatasetDataType.SINGLE_OBJECT_WITHIN_SCENE:
             if self._verbose:
@@ -321,7 +328,6 @@ class SpartanDataset(DenseCorrespondenceDataset):
         :return:
         :rtype:
         """
-
         for scene_name in self.scene_generator():
             self.get_pose_data(scene_name)
 
@@ -333,6 +339,9 @@ class SpartanDataset(DenseCorrespondenceDataset):
         :return: a dict() of the pose_data.yaml for the scene.
         :rtype: dict()
         """
+        '''
+        {0: {'camera_to_world': {'quaternion': {'w': 0.12371642167332954, 'x': -0.6949531515743758, 'y': 0.6889893379154927, 'z': -0.16440211788161568}, 'translation': {'x': 0.2986105938359098, 'y': -0.00606538123328232, 'z': 0.8279190673188448}}, 'depth_image_filename': '000000_depth.png', 'rgb_image_filename': '000000_rgb.png', 'timestamp': 1523888723371051542}, 8: {'camera_to_world': {'quaternion': {'w': 0.13430848460724662, 'x': -0.6591980787593131, 'y': 0.7233124987413563, 'z': -0.15568607223214118}, 'translation': {'x': 0.30031109973971964, 'y': -7.41320...62873e-06, 'z': 0.8284353464016874}}, 'depth_image_filename': '000008_depth.png', 'rgb_image_filename': '000008_rgb.png', 'timestamp': 1523888723638000242}, 13: {'camera_to_world': {'quaternion': {'w': 0.14308604823197923, 'x': -0.6270184061777639, 'y': 0.7513529514632176, 'z': -0.1477939222132144}, 'translation': {'x': 0.30223457675513327, 'y': 0.005037671466164324, 'z': 0.8290563079959488}}, 'depth_image_filename': '000013_depth.png', 'rgb_image_filename': '000013_rgb.png', 'timestamp': 1523888723804818146}, 18: {'camera_to_world': {'quaternion': {'w': 0.15276777797801877, 'x': -0.5889438886695113, 'y': 0.7814210079298669, 'z': -0.1385218768872424}, 'translation': {'x': 0.3048481131713285, 'y': 0.010529503398326551, 'z': 0.830061214271073}}, 'depth_image_filename': '000018_depth.png', 'rgb_image_filename': '000018_rgb.png', 'timestamp': 1523888723971665136}, ...}
+        '''
         if scene_name not in self._pose_data:
             logging.info("Loading pose data for scene %s" %(scene_name) )
             pose_data_filename = os.path.join(self.get_full_path_for_scene(scene_name),
@@ -1152,7 +1161,7 @@ class SpartanDataset(DenseCorrespondenceDataset):
 
         # return self.config["image_normalization"]["mean"]
 
-
+        # TODO: Change to carla mean
         return constants.DEFAULT_IMAGE_MEAN
 
     def get_image_std_dev(self):
@@ -1167,6 +1176,7 @@ class SpartanDataset(DenseCorrespondenceDataset):
 
         # return self.config["image_normalization"]["std_dev"]
 
+        # TODO: Change to carla std_dev
         return constants.DEFAULT_IMAGE_STD_DEV
 
 

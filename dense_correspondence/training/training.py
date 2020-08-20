@@ -41,7 +41,8 @@ from dense_correspondence.network.dense_correspondence_network import DenseCorre
 from dense_correspondence.loss_functions.pixelwise_contrastive_loss import PixelwiseContrastiveLoss
 import dense_correspondence.loss_functions.loss_composer as loss_composer
 from dense_correspondence.evaluation.evaluation import DenseCorrespondenceEvaluation
-
+import ipdb 
+st = ipdb.set_trace
 
 class DenseCorrespondenceTraining(object):
 
@@ -89,10 +90,9 @@ class DenseCorrespondenceTraining(object):
         if self._dataset is None:
             self._dataset = SpartanDataset.make_default_10_scenes_drill()
 
-        
         self._dataset.load_all_pose_data()
         self._dataset.set_parameters_from_training_config(self._config)
-
+        # self._dataset.__getitem__(0)
         self._data_loader = torch.utils.data.DataLoader(self._dataset, batch_size=batch_size,
                                           shuffle=True, num_workers=num_workers, drop_last=True)
 
