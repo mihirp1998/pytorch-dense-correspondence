@@ -1,0 +1,10 @@
+logs_root_path: logs_proto
+object_id: "carla"
+train:
+- "15885530688973927"
+test:
+- "15885530688973927"
+evaluation_labeled_data_path: 
+- "evaluation_labeled_data/caterpillar_cross_scene_labels.yaml"
+pickle_folder:
+- "/projects/katefgroup/datasets/shamit_carla_correct/npys/mc"

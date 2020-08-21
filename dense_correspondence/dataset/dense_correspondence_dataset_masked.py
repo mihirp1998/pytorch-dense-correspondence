@@ -19,7 +19,8 @@ from torchvision import transforms
 from pytorch_segmentation_detection.transforms import ComposeJoint
 import dense_correspondence.correspondence_tools.correspondence_finder as correspondence_finder
 import dense_correspondence.correspondence_tools.correspondence_augmentation as correspondence_augmentation
-
+import ipdb
+st = ipdb.set_trace
 
 
 # This implements a subclass for a data.Dataset class in PyTorch
@@ -556,6 +557,7 @@ class DenseCorrespondenceDataset(data.Dataset):
         self._data_load_type_probabilities = []
 
         p = training_config["training"]["data_type_probabilities"]["SINGLE_OBJECT_WITHIN_SCENE"] 
+        # st()
         if p > 0:
             print "using SINGLE_OBJECT_WITHIN_SCENE"
             self._data_load_types.append(SpartanDatasetDataType.SINGLE_OBJECT_WITHIN_SCENE)

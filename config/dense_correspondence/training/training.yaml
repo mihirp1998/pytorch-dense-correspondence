@@ -22,8 +22,8 @@ training:
   use_image_b_mask_inv: True
   cross_scene_num_samples: 10000
   data_type_probabilities:
-    SINGLE_OBJECT_WITHIN_SCENE: 1
-    SINGLE_OBJECT_ACROSS_SCENE: 0
+    SINGLE_OBJECT_WITHIN_SCENE: 0.5
+    SINGLE_OBJECT_ACROSS_SCENE: 0.5
     DIFFERENT_OBJECT: 0
     MULTI_OBJECT: 0
     SYNTHETIC_MULTI_OBJECT: 0

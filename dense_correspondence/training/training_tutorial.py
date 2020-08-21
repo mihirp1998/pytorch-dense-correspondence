@@ -28,7 +28,7 @@ class TrainingTutorial:
     def load_configuration(self):
         # config_filename = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence',
         config_filename = os.path.join(DIR_PROJ, 'config', 'dense_correspondence',
-                                       'dataset', 'composite', 'caterpillar_only_9.yaml')
+                                       'dataset', 'composite', 'carla_4cars.yaml')
         config = utils.getDictFromYamlFilename(config_filename)
         # train_config_file = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence',
         train_config_file = os.path.join(DIR_PROJ, 'config', 'dense_correspondence',
@@ -40,7 +40,7 @@ class TrainingTutorial:
         logging_dir = "code/data_volume/pdc/trained_models/tutorials"
         num_iterations = 3500
         descr_dim = 3  # the descriptor dimension
-        self.train_config["training"]["logging_dir_name"] = "caterpillar_%d" % (descr_dim)
+        self.train_config["training"]["logging_dir_name"] = "carla_%d" % (descr_dim)
         self.train_config["training"]["logging_dir"] = logging_dir
         self.train_config["dense_correspondence_network"]["descriptor_dimension"] = descr_dim
         self.train_config["training"]["num_iterations"] = num_iterations
