@@ -10,8 +10,10 @@ sys.path.append(dc_source_dir)
 sys.path.append(os.path.join(dc_source_dir, "dense_correspondence", "correspondence_tools"))
 from dense_correspondence.dataset.spartan_dataset_masked import SpartanDataset, ImageType
 
+# config_filename = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence', 
+#                                'dataset', 'composite', 'star_bot_front_only.yaml')
 config_filename = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence', 
-                               'dataset', 'composite', 'star_bot_front_only.yaml')
+                               'dataset', 'composite', 'carla_4cars.yaml')
 config = utils.getDictFromYamlFilename(config_filename)
 sd = SpartanDataset(config=config)
 sd.set_train_mode()
