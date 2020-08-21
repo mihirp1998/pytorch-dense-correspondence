@@ -4,3 +4,6 @@ single_object_scenes_config_files:
 - carla_4cars_train.yaml
 
 multi_object_scenes_config_files: []
+
+pickle_folder:
+- "/projects/katefgroup/datasets/shamit_carla_correct/npys/mc_don"

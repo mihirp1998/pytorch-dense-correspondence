@@ -128,7 +128,8 @@ class SpartanDataset(DenseCorrespondenceDataset):
 
 
         data_load_type = self._get_data_load_type()
-        st()
+        data_load_type = 0 # TODO shamit: remove this after debugging Case 0
+        # st()
         # Case 0: Same scene, same object
         if data_load_type == SpartanDatasetDataType.SINGLE_OBJECT_WITHIN_SCENE:
             if self._verbose:
@@ -213,6 +214,8 @@ class SpartanDataset(DenseCorrespondenceDataset):
         self._config["logs_root_path"] = config['logs_root_path']
         self._config["single_object"] = self._single_object_scene_dict
         self._config["multi_object"] = self._multi_object_scene_dict
+        # st()
+        self._config['pickle_folder'] = config['pickle_folder'][0]
 
         self._setup_data_load_types()
 
@@ -564,6 +567,7 @@ class SpartanDataset(DenseCorrespondenceDataset):
         metadata["object_id_int"] = sorted(self._single_object_scene_dict.keys()).index(object_id)
         metadata["scene_name"] = scene_name
         metadata["type"] = SpartanDatasetDataType.SINGLE_OBJECT_WITHIN_SCENE
+        metadata['pickle_folder'] = self._config['pickle_folder']
 
         return self.get_within_scene_data(scene_name, metadata)
 
@@ -632,9 +636,8 @@ class SpartanDataset(DenseCorrespondenceDataset):
         """
 
         SD = SpartanDataset
-
         image_a_idx = self.get_random_image_index(scene_name)
-        image_a_rgb, image_a_depth, image_a_mask, image_a_pose = self.get_rgbd_mask_pose(scene_name, image_a_idx)
+        image_a_rgb, image_a_depth, image_a_mask, image_a_pose = self.get_rgbd_mask_pose(scene_name, image_a_idx, pickle_folder=metadata['pickle_folder'])
 
         metadata['image_a_idx'] = image_a_idx
 
@@ -647,8 +650,9 @@ class SpartanDataset(DenseCorrespondenceDataset):
             image_a_rgb_tensor = self.rgb_image_to_tensor(image_a_rgb)
             return self.return_empty_data(image_a_rgb_tensor, image_a_rgb_tensor)
 
-        image_b_rgb, image_b_depth, image_b_mask, image_b_pose = self.get_rgbd_mask_pose(scene_name, image_b_idx)
+        image_b_rgb, image_b_depth, image_b_mask, image_b_pose = self.get_rgbd_mask_pose(scene_name, image_b_idx, pickle_folder=metadata['pickle_folder'])
 
+        # st()
         image_a_depth_numpy = np.asarray(image_a_depth)
         image_b_depth_numpy = np.asarray(image_b_depth)
 
@@ -662,7 +666,7 @@ class SpartanDataset(DenseCorrespondenceDataset):
                                                                             image_b_depth_numpy, image_b_pose,
                                                                             img_a_mask=correspondence_mask,
                                                                             num_attempts=self.num_matching_attempts)
-
+        # st()
         if for_synthetic_multi_object:
             return image_a_rgb, image_b_rgb, image_a_depth, image_b_depth, image_a_mask, image_b_mask, uv_a, uv_b
 
@@ -878,6 +882,7 @@ class SpartanDataset(DenseCorrespondenceDataset):
         metadata["scene_name_a"] = scene_name_a
         metadata["scene_name_b"] = scene_name_b
         metadata["type"] = SpartanDatasetDataType.SINGLE_OBJECT_ACROSS_SCENE
+        metadata['pickle_folder'] = self._config['pickle_folder']
         return self.get_across_scene_data(scene_name_a, scene_name_b, metadata)
 
     def get_different_object_data(self):
@@ -1084,13 +1089,13 @@ class SpartanDataset(DenseCorrespondenceDataset):
             raise ValueError("There are no single object scenes in this dataset")
 
         image_a_idx = self.get_random_image_index(scene_name_a)
-        image_a_rgb, image_a_depth, image_a_mask, image_a_pose = self.get_rgbd_mask_pose(scene_name_a, image_a_idx)
+        image_a_rgb, image_a_depth, image_a_mask, image_a_pose = self.get_rgbd_mask_pose(scene_name_a, image_a_idx, pickle_folder=metadata['pickle_folder'])
 
         metadata['image_a_idx'] = image_a_idx
 
         # image b
         image_b_idx = self.get_random_image_index(scene_name_b)
-        image_b_rgb, image_b_depth, image_b_mask, image_b_pose = self.get_rgbd_mask_pose(scene_name_b, image_b_idx)
+        image_b_rgb, image_b_depth, image_b_mask, image_b_pose = self.get_rgbd_mask_pose(scene_name_b, image_b_idx, pickle_folder=metadata['pickle_folder'])
         metadata['image_b_idx'] = image_b_idx
 
         # sample random indices from mask in image a

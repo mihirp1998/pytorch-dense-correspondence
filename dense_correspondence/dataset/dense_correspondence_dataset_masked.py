@@ -10,6 +10,7 @@ import numpy as np
 import random
 import glob
 from PIL import Image
+import pickle
 
 import sys
 import dense_correspondence_manipulation.utils.utils as utils
@@ -223,7 +224,7 @@ class DenseCorrespondenceDataset(data.Dataset):
         """
         return ((len(tensor) == 1) and (tensor[0] == -1))
 
-    def get_rgbd_mask_pose(self, scene_name, img_idx):
+    def get_rgbd_mask_pose(self, scene_name, img_idx, pickle_folder='/projects/katefgroup/datasets/shamit_carla_correct/npys/mc_don'):
         """
         Returns rgb image, depth image, mask and pose.
         :param scene_name:
@@ -233,16 +234,25 @@ class DenseCorrespondenceDataset(data.Dataset):
         :return: rgb, depth, mask, pose
         :rtype: PIL.Image.Image, PIL.Image.Image, PIL.Image.Image, a 4x4 numpy array
         """
+        # st()
+        pickle_name = os.path.join(pickle_folder, scene_name+".p")
+        p = pickle.load(open(pickle_name, 'rb'))
+
         rgb_file = self.get_image_filename(scene_name, img_idx, ImageType.RGB)
         rgb = self.get_rgb_image(rgb_file)
 
         depth_file = self.get_image_filename(scene_name, img_idx, ImageType.DEPTH)
-        depth = self.get_depth_image(depth_file)
+        # depth = self.get_depth_image(depth_file)
+        depth = p['depth_camXs_raw'][img_idx, 0]*1000 # divide by DEPTH_IM_SCALE later.
+        depth = Image.fromarray(depth)
 
         mask_file = self.get_image_filename(scene_name, img_idx, ImageType.MASK)
-        mask = self.get_mask_image(mask_file)
+        # mask = self.get_mask_image(mask_file)
+        mask = p['segment_camXs_raw'][img_idx, 0]
+        mask = Image.fromarray(mask)
 
-        pose = self.get_pose_from_scene_name_and_idx(scene_name, img_idx)
+        # pose = self.get_pose_from_scene_name_and_idx(scene_name, img_idx)
+        pose = p['origin_T_camXs_raw'][img_idx]
 
         return rgb, depth, mask, pose
 

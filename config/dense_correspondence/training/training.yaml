@@ -37,8 +37,8 @@ training:
 
 dense_correspondence_network:
   descriptor_dimension: 3
-  image_width: 640
-  image_height: 480
+  image_width: 256
+  image_height: 256
   normalize: False
   backbone:
     model_class: "Resnet"         # options: {Resnet, Unet}

@@ -7,4 +7,4 @@ test:
 evaluation_labeled_data_path: 
 - "evaluation_labeled_data/caterpillar_cross_scene_labels.yaml"
 pickle_folder:
-- "/projects/katefgroup/datasets/shamit_carla_correct/npys/mc"
+- "/projects/katefgroup/datasets/shamit_carla_correct/npys/mc_don"
