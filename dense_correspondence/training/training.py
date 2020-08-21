@@ -92,7 +92,7 @@ class DenseCorrespondenceTraining(object):
 
         self._dataset.load_all_pose_data()
         self._dataset.set_parameters_from_training_config(self._config)
-        # self._dataset.__getitem__(0)
+        # self._dataset.__getitem__(0) # TODO shamit: comment it
         self._data_loader = torch.utils.data.DataLoader(self._dataset, batch_size=batch_size,
                                           shuffle=True, num_workers=num_workers, drop_last=True)
 
@@ -305,7 +305,19 @@ class DenseCorrespondenceTraining(object):
                 if (match_type == -1).all():
                     print "\n empty data, continuing \n"
                     continue
+                
+                print("Matches_a.shape: ", matches_a.shape)
+                # print("Matches_b.shape: ", matches_b.shape)
+                # print("masked_non_matches_a.shape: ", masked_non_matches_a.shape)
+                # print("masked_non_matches_b.shape: ", masked_non_matches_b.shape)
+                # print("background_non_matches_a.shape: ", background_non_matches_a.shape)
+                # print("background_non_matches_b.shape: ", background_non_matches_b.shape)
+                # print("blind_non_matches_a.shape: ", blind_non_matches_a.shape)
+                # print("blind_non_matches_b.shape: ", blind_non_matches_b.shape)
 
+                if matches_a.shape[1] == 0:
+                    print("No matches")
+                    continue
 
                 data_type = metadata["type"][0]
                 
@@ -482,7 +494,9 @@ class DenseCorrespondenceTraining(object):
         if not os.path.isdir(self._logging_dir):
             os.makedirs(self._logging_dir)
 
+        # st()
         # make the tensorboard log directory
+        # /projects/katefgroup/datasets/denseobj_carla//pdc/code/data_volume/pdc/trained_models/tutorials/carla_3/tensorboard
         self._tensorboard_log_dir = os.path.join(self._logging_dir, "tensorboard")
         if not os.path.isdir(self._tensorboard_log_dir):
             os.makedirs(self._tensorboard_log_dir)

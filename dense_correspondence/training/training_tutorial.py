@@ -2,6 +2,9 @@ import os
 import sys
 from config.params import *
 import logging
+import matplotlib
+matplotlib.use('Agg')
+
 os.chdir(DIR_PROJ)
 sys.path.append(os.path.join(DIR_PROJ, 'modules'))
 os.environ['DC_SOURCE_DIR'] = DIR_PROJ

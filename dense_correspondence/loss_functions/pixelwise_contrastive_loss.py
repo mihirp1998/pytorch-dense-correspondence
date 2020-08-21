@@ -1,6 +1,7 @@
 import torch
 from torch.autograd import Variable
-
+import ipdb 
+st = ipdb.set_trace
 
 class PixelwiseContrastiveLoss(object):
 
@@ -162,8 +163,11 @@ class PixelwiseContrastiveLoss(object):
             matches_a_descriptors = matches_a_descriptors.unsqueeze(0)
             matches_b_descriptors = matches_b_descriptors.unsqueeze(0)
 
-        match_loss = 1.0 / num_matches * (matches_a_descriptors - matches_b_descriptors).pow(2).sum()
-
+        try:
+            match_loss = 1.0 / num_matches * (matches_a_descriptors - matches_b_descriptors).pow(2).sum()
+        except Exception as e:
+            st()
+            aa=1
         return match_loss, matches_a_descriptors, matches_b_descriptors
 
 

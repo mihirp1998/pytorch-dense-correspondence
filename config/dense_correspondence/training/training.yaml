@@ -2,9 +2,9 @@ training:
   # Optimizer config
   learning_rate: 1.0e-4
   learning_rate_decay: 0.9
-  steps_between_learning_rate_decay: 250 # decay the learning rate after this many steps
+  steps_between_learning_rate_decay: 500 #250 # decay the learning rate after this many steps
   weight_decay: 1.0e-4
-  num_iterations: 3500 # number of iterations to train for
+  num_iterations: 4500 #3500 # number of iterations to train for
   # Dataset loader config
   num_workers: 5 # num threads/workers for dataset loading
   compute_test_loss: False
@@ -31,7 +31,7 @@ training:
   loss_function: pixelwise_contrastive_loss # not currently used
   # Logging config
   logging_rate: 100 # how often to print out
-  save_rate: 1000 # how often to save the network
+  save_rate: 500 #1000 # how often to save the network
   logging_dir_name: test # overwrites if this is here
   logging_dir: trained_models # where to store trained models
 

@@ -35,7 +35,6 @@ def pytorch_rand_select_pixel(width,height,num_samples=1):
 
 def get_default_K_matrix():
 
-    # TODO shamit: Hardcode carla intrinsics here - Done
     K = numpy.zeros((3,3))
     K[0,0] = 89.626564 #533.6422696034836 # focal x
     K[1,1] = 89.626564 #534.7824445233571 # focal y

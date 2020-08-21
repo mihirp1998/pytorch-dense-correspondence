@@ -128,8 +128,7 @@ class SpartanDataset(DenseCorrespondenceDataset):
 
 
         data_load_type = self._get_data_load_type()
-        data_load_type = 0 # TODO shamit: remove this after debugging Case 0
-        # st()
+
         # Case 0: Same scene, same object
         if data_load_type == SpartanDatasetDataType.SINGLE_OBJECT_WITHIN_SCENE:
             if self._verbose:
@@ -678,19 +677,20 @@ class SpartanDataset(DenseCorrespondenceDataset):
 
 
         # data augmentation
-        if self._domain_randomize:
-            image_a_rgb = correspondence_augmentation.random_domain_randomize_background(image_a_rgb, image_a_mask)
-            image_b_rgb = correspondence_augmentation.random_domain_randomize_background(image_b_rgb, image_b_mask)
+        # TODO shamit: Uncomment maybe
+        # if self._domain_randomize:
+        #     image_a_rgb = correspondence_augmentation.random_domain_randomize_background(image_a_rgb, image_a_mask)
+        #     image_b_rgb = correspondence_augmentation.random_domain_randomize_background(image_b_rgb, image_b_mask)
 
-        if not self.debug:
-            [image_a_rgb, image_a_mask], uv_a = correspondence_augmentation.random_image_and_indices_mutation([image_a_rgb, image_a_mask], uv_a)
-            [image_b_rgb, image_b_mask], uv_b = correspondence_augmentation.random_image_and_indices_mutation(
-                [image_b_rgb, image_b_mask], uv_b)
-        else:  # also mutate depth just for plotting
-            [image_a_rgb, image_a_depth, image_a_mask], uv_a = correspondence_augmentation.random_image_and_indices_mutation(
-                [image_a_rgb, image_a_depth, image_a_mask], uv_a)
-            [image_b_rgb, image_b_depth, image_b_mask], uv_b = correspondence_augmentation.random_image_and_indices_mutation(
-                [image_b_rgb, image_b_depth, image_b_mask], uv_b)
+        # if not self.debug:
+        #     [image_a_rgb, image_a_mask], uv_a = correspondence_augmentation.random_image_and_indices_mutation([image_a_rgb, image_a_mask], uv_a)
+        #     [image_b_rgb, image_b_mask], uv_b = correspondence_augmentation.random_image_and_indices_mutation(
+        #         [image_b_rgb, image_b_mask], uv_b)
+        # else:  # also mutate depth just for plotting
+        #     [image_a_rgb, image_a_depth, image_a_mask], uv_a = correspondence_augmentation.random_image_and_indices_mutation(
+        #         [image_a_rgb, image_a_depth, image_a_mask], uv_a)
+        #     [image_b_rgb, image_b_depth, image_b_mask], uv_b = correspondence_augmentation.random_image_and_indices_mutation(
+        #         [image_b_rgb, image_b_depth, image_b_mask], uv_b)
 
         image_a_depth_numpy = np.asarray(image_a_depth)
         image_b_depth_numpy = np.asarray(image_b_depth)
@@ -782,9 +782,9 @@ class SpartanDataset(DenseCorrespondenceDataset):
             blind_non_matches_a = blind_non_matches_b = SD.empty_tensor()
 
 
-        if self.debug:
+        if self.debug: # or True: # TODO shamit: remove true
             # downsample so can plot
-            num_matches_to_plot = 10
+            num_matches_to_plot = 3
             plot_uv_a, plot_uv_b = SD.subsample_tuple_pair(uv_a, uv_b, num_samples=num_matches_to_plot)
 
             plot_uv_a_masked_long, plot_uv_b_masked_non_matches_long = SD.subsample_tuple_pair(uv_a_masked_long, uv_b_masked_non_matches_long, num_samples=num_matches_to_plot*3)
@@ -795,7 +795,7 @@ class SpartanDataset(DenseCorrespondenceDataset):
             plot_blind_uv_a, plot_blind_uv_b = SD.subsample_tuple_pair(blind_uv_a, blind_uv_b, num_samples=num_matches_to_plot*10)
 
 
-        if self.debug:
+        if self.debug: # or True: # TODO shamit: remove true
             # only want to bring in plotting code if in debug mode
             import dense_correspondence.correspondence_tools.correspondence_plotter as correspondence_plotter
 
@@ -804,12 +804,11 @@ class SpartanDataset(DenseCorrespondenceDataset):
                 fig, axes = correspondence_plotter.plot_correspondences_direct(image_a_rgb_PIL, image_a_depth_numpy,
                                                                                image_b_rgb_PIL, image_b_depth_numpy,
                                                                                plot_uv_a, plot_uv_b, show=False)
-
                 correspondence_plotter.plot_correspondences_direct(image_a_rgb_PIL, image_a_depth_numpy,
                                                                    image_b_rgb_PIL, image_b_depth_numpy,
                                                                    plot_uv_a_masked_long, plot_uv_b_masked_non_matches_long,
                                                                    use_previous_plot=(fig, axes),
-                                                                   circ_color='r')
+                                                                   circ_color='r', save=True)
 
                 fig, axes = correspondence_plotter.plot_correspondences_direct(image_a_rgb_PIL, image_a_depth_numpy,
                                                                                image_b_rgb_PIL, image_b_depth_numpy,
@@ -819,14 +818,15 @@ class SpartanDataset(DenseCorrespondenceDataset):
                                                                    image_b_rgb_PIL, image_b_depth_numpy,
                                                                    plot_uv_a_background_long, plot_uv_b_background_non_matches_long,
                                                                    use_previous_plot=(fig, axes),
-                                                                   circ_color='b')
+                                                                   circ_color='b', save=True)
 
 
                 correspondence_plotter.plot_correspondences_direct(image_a_rgb_PIL, image_a_depth_numpy,
                                                                    image_b_rgb_PIL, image_b_depth_numpy,
                                                                    plot_blind_uv_a, plot_blind_uv_b,
-                                                                   circ_color='k', show=True)
+                                                                   circ_color='k', show=True, save=True)
 
+                st()
                 # Mask-plotting city
                 import matplotlib.pyplot as plt
                 plt.imshow(np.asarray(image_a_mask))
@@ -1108,20 +1108,20 @@ class SpartanDataset(DenseCorrespondenceDataset):
             image_a_rgb_tensor = self.rgb_image_to_tensor(image_a_rgb)
             return self.return_empty_data(image_a_rgb_tensor, image_a_rgb_tensor)
 
-        # data augmentation
-        if self._domain_randomize:
-            image_a_rgb = correspondence_augmentation.random_domain_randomize_background(image_a_rgb, image_a_mask)
-            image_b_rgb = correspondence_augmentation.random_domain_randomize_background(image_b_rgb, image_b_mask)
+        # data augmentation # TODO shamit: Uncomment later maybe
+        # if self._domain_randomize:
+        #     image_a_rgb = correspondence_augmentation.random_domain_randomize_background(image_a_rgb, image_a_mask)
+        #     image_b_rgb = correspondence_augmentation.random_domain_randomize_background(image_b_rgb, image_b_mask)
 
-        if not self.debug:
-            [image_a_rgb, image_a_mask], blind_uv_a = correspondence_augmentation.random_image_and_indices_mutation([image_a_rgb, image_a_mask], blind_uv_a)
-            [image_b_rgb, image_b_mask], blind_uv_b = correspondence_augmentation.random_image_and_indices_mutation(
-                [image_b_rgb, image_b_mask], blind_uv_b)
-        else:  # also mutate depth just for plotting
-            [image_a_rgb, image_a_depth, image_a_mask], blind_uv_a = correspondence_augmentation.random_image_and_indices_mutation(
-                [image_a_rgb, image_a_depth, image_a_mask], blind_uv_a)
-            [image_b_rgb, image_b_depth, image_b_mask], blind_uv_b = correspondence_augmentation.random_image_and_indices_mutation(
-                [image_b_rgb, image_b_depth, image_b_mask], blind_uv_b)
+        # if not self.debug:
+        #     [image_a_rgb, image_a_mask], blind_uv_a = correspondence_augmentation.random_image_and_indices_mutation([image_a_rgb, image_a_mask], blind_uv_a)
+        #     [image_b_rgb, image_b_mask], blind_uv_b = correspondence_augmentation.random_image_and_indices_mutation(
+        #         [image_b_rgb, image_b_mask], blind_uv_b)
+        # else:  # also mutate depth just for plotting
+        #     [image_a_rgb, image_a_depth, image_a_mask], blind_uv_a = correspondence_augmentation.random_image_and_indices_mutation(
+        #         [image_a_rgb, image_a_depth, image_a_mask], blind_uv_a)
+        #     [image_b_rgb, image_b_depth, image_b_mask], blind_uv_b = correspondence_augmentation.random_image_and_indices_mutation(
+        #         [image_b_rgb, image_b_depth, image_b_mask], blind_uv_b)
 
         image_a_depth_numpy = np.asarray(image_a_depth)
         image_b_depth_numpy = np.asarray(image_b_depth)
