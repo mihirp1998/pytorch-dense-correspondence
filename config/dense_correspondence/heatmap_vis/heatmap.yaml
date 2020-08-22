@@ -15,6 +15,19 @@ pickle_folder:
 
 do_pca: True
 
+hardcode_samples: True
+scene_name_1_list:
+- "15885529876821635"
+- "15885530311595225"
+scene_name_2_list:
+- "15885529942093484"
+- "15885537448825345"
+image_1_idx_list:
+- 11
+- 6
+image_2_idx_list:
+- 13
+- 7
 norm_diff_threshold_dict:
   hats_consistent_M_background_0.500_3:
     0.25

@@ -70,6 +70,7 @@ class HeatmapVisualization(object):
         self._load_networks()
         self._reticle_color = COLOR_GREEN
         self._paused = False
+        self.hardcode_samples_idx = 0
         if LOAD_SPECIFIC_DATASET:
             self.load_specific_dataset() # uncomment if you want to load a specific dataset
 
@@ -200,6 +201,12 @@ class HeatmapVisualization(object):
         # hats
         # scene_name_1 = "2018-05-15-22-01-44"
         # scene_name_2 = "2018-05-15-22-04-17"
+        if self._config['hardcode_samples']:
+            scene_name_1 = self._config['scene_name_1_list'][self.hardcode_samples_idx]
+            scene_name_2 = self._config['scene_name_2_list'][self.hardcode_samples_idx]
+            image_1_idx = self._config['image_1_idx_list'][self.hardcode_samples_idx]
+            image_2_idx = self._config['image_2_idx_list'][self.hardcode_samples_idx]
+            self.hardcode_samples_idx = (self.hardcode_samples_idx+1)%len(self._config['scene_name_1_list'])
 
         self.img1_pil = self._dataset.get_rgb_image_from_scene_name_and_idx(scene_name_1, image_1_idx)
         self.img2_pil = self._dataset.get_rgb_image_from_scene_name_and_idx(scene_name_2, image_2_idx)
@@ -266,8 +273,8 @@ class HeatmapVisualization(object):
             
             fname = '/home/mprabhud/denseobjnet/{}_{}_{}_{}.jpg'.format(str(self._scene_name_1), str(self._scene_name_2), str(self._image_1_idx), str(self._image_2_idx))
             plt.imsave(fname, rgb_pca)
-            st()
-            aa=1
+            # st()
+            # aa=1
 
         self.find_best_match(None, 0, 0, None, None)
 
