@@ -5,13 +5,13 @@ import numpy as np
 import copy
 from config.params import *
 import logging
-
+import pickle
 os.environ['DC_SOURCE_DIR'] = DIR_PROJ
 os.environ['DC_DATA_DIR'] = "{}/pdc".format(DIR_DATA)
 import ipdb
 st = ipdb.set_trace
 # st()
-
+from sklearn.decomposition import PCA
 import dense_correspondence_manipulation.utils.utils as utils
 
 dc_source_dir = utils.getDenseCorrespondenceSourceDir()
@@ -19,6 +19,7 @@ sys.path.append(dc_source_dir)
 sys.path.append(os.path.join(dc_source_dir, "dense_correspondence", "correspondence_tools"))
 from dense_correspondence.dataset.spartan_dataset_masked import SpartanDataset, ImageType
 
+import matplotlib.pyplot as plt
 import dense_correspondence
 from dense_correspondence.evaluation.evaluation import *
 from dense_correspondence.evaluation.plotting import normalize_descriptor
@@ -202,11 +203,15 @@ class HeatmapVisualization(object):
 
         self.img1_pil = self._dataset.get_rgb_image_from_scene_name_and_idx(scene_name_1, image_1_idx)
         self.img2_pil = self._dataset.get_rgb_image_from_scene_name_and_idx(scene_name_2, image_2_idx)
+        # self.img1_pil.save('/home/mprabhud/denseobjnet/fig1.jpg')
 
         self._scene_name_1 = scene_name_1
         self._scene_name_2 = scene_name_2
         self._image_1_idx = image_1_idx
         self._image_2_idx = image_2_idx
+        self.pickle_path = self._config['pickle_folder'][0]
+
+        print("scene1: {}, scene2: {}, idx1: {}, idx2: {}".format(self._scene_name_1, self._scene_name_2, self._image_1_idx, self._image_2_idx))
 
         self._compute_descriptors()
 
@@ -235,7 +240,34 @@ class HeatmapVisualization(object):
         for network_name, dcn in self._dcn_dict.iteritems():
             self._res_a[network_name] = dcn.forward_single_image_tensor(self.rgb_1_tensor).data.cpu().numpy()
             self._res_b[network_name] = dcn.forward_single_image_tensor(self.rgb_2_tensor).data.cpu().numpy()
+        # st()
 
+        if self._config['do_pca']:
+            fname = os.path.join(self.pickle_path, self._scene_name_1 + '.p')
+            pfile1 = pickle.load(open(fname, 'rb'))
+            segment1 = pfile1['segment_camXs_raw'][self._image_1_idx].transpose(1,2,0)
+
+            fname = os.path.join(self.pickle_path, self._scene_name_2 + '.p')
+            pfile2 = pickle.load(open(fname,'rb'))
+            segment2 = pfile1['segment_camXs_raw'][self._image_2_idx].transpose(1,2,0)
+
+            out1 = self._res_a[network_name]*segment1
+            out2 = self._res_b[network_name]*segment2
+
+            outcat = np.concatenate([out1, out2], axis=1)
+            out = torch.tensor(outcat).permute(2,0,1).unsqueeze(0)
+            feat_pca = get_feat_pca(out)
+            rgb_pca = back2color(feat_pca)
+            rgb_pca = rgb_pca[0].permute(1,2,0).cpu().numpy()
+
+            rgb_cat = np.concatenate([self.img1, self.img2], axis=1)
+            rgb_pca = np.concatenate([rgb_pca, rgb_cat], axis=0)
+
+            
+            fname = '/home/mprabhud/denseobjnet/{}_{}_{}_{}.jpg'.format(str(self._scene_name_1), str(self._scene_name_2), str(self._image_1_idx), str(self._image_2_idx))
+            plt.imsave(fname, rgb_pca)
+            st()
+            aa=1
 
         self.find_best_match(None, 0, 0, None, None)
 
@@ -366,6 +398,83 @@ class HeatmapVisualization(object):
                     print "pausing"
                     self._paused = True
 
+
+EPS = 1e-6
+
+def back2color(i, blacken_zeros=False):
+	if blacken_zeros:
+		const = torch.tensor([-0.5])
+		i = torch.where(i==0.0, const.cuda() if i.is_cuda else const, i)
+		return back2color(i)
+	else:
+		return ((i+0.5)*255).type(torch.ByteTensor)
+
+def get_feat_pca(feat):
+	B, C, D, W = list(feat.size())
+	# feat is B x C x D x W. If 3D input, average it through Height dimension before passing into this function.
+
+	pca, _ = reduce_emb(feat, inbound=None, together=True)
+	# pca is B x 3 x W x D
+	return pca
+
+def reduce_emb(emb, inbound=None, together=False):
+	## emb -- [S,C,H/2,W/2], inbound -- [S,1,H/2,W/2]
+	## Reduce number of chans to 3 with PCA. For vis.
+	# S,H,W,C = emb.shape.as_list()
+	S, C, H, W = list(emb.size())
+	keep = 3
+
+	if together:
+		reduced_emb = pca_embed_together(emb, keep)
+	else:
+		reduced_emb = pca_embed(emb, keep) #not im
+
+	reduced_emb = normalize(reduced_emb) - 0.5
+	if inbound is not None:
+		emb_inbound = emb*inbound
+	else:
+		emb_inbound = None
+
+	return reduced_emb, emb_inbound
+
+def pca_embed_together(emb, keep):
+	## emb -- [S,H/2,W/2,C]
+	## keep is the number of principal components to keep
+	## Helper function for reduce_emb.
+	emb = emb + EPS
+	#emb is B x C x H x W
+	emb = emb.permute(0, 2, 3, 1).cpu().detach().numpy() #this is B x H x W x C
+
+	B, H, W, C = np.shape(emb)
+	if np.isnan(emb).any():
+		out_img = torch.zeros(B, keep, H, W)
+
+	pixelskd = np.reshape(emb, (B*H*W, C))
+	P = PCA(keep)
+	P.fit(pixelskd)
+	pixels3d = P.transform(pixelskd)
+	out_img = np.reshape(pixels3d, [B,H,W,keep]).astype(np.float32)
+	if np.isnan(out_img).any():
+		out_img = torch.zeros(B, keep, H, W)
+	return torch.from_numpy(out_img).permute(0, 3, 1, 2)
+
+
+def normalize(d):
+    # d is B x whatever. normalize within each element of the batch
+    out = torch.zeros(d.size())
+    if d.is_cuda:
+        out = out.cuda()
+    B = list(d.size())[0]
+    for b in range(B):
+        out[b] = normalize_single(d[b])
+    return out
+
+def normalize_single(d):
+    # d is a whatever shape torch tensor
+    dmin = torch.min(d)
+    dmax = torch.max(d)
+    d = (d-dmin)/(EPS+(dmax-dmin))
+    return d
 
 if __name__ == "__main__":
     dc_source_dir = utils.getDenseCorrespondenceSourceDir()

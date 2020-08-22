@@ -10,6 +10,11 @@ kernel_variance: 0.25
 networks:
 - "carla_3"
 
+pickle_folder:
+- "/projects/katefgroup/datasets/shamit_carla_correct/npys/mc_don"
+
+do_pca: True
+
 norm_diff_threshold_dict:
   hats_consistent_M_background_0.500_3:
     0.25
