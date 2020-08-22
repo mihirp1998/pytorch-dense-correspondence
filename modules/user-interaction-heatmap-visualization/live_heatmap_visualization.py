@@ -71,6 +71,7 @@ class HeatmapVisualization(object):
         self._reticle_color = COLOR_GREEN
         self._paused = False
         self.hardcode_samples_idx = 0
+        self.first_sample_call = 1
         if LOAD_SPECIFIC_DATASET:
             self.load_specific_dataset() # uncomment if you want to load a specific dataset
 
@@ -206,7 +207,9 @@ class HeatmapVisualization(object):
             scene_name_2 = self._config['scene_name_2_list'][self.hardcode_samples_idx]
             image_1_idx = self._config['image_1_idx_list'][self.hardcode_samples_idx]
             image_2_idx = self._config['image_2_idx_list'][self.hardcode_samples_idx]
-            self.hardcode_samples_idx = (self.hardcode_samples_idx+1)%len(self._config['scene_name_1_list'])
+            if self.first_sample_call == 0:
+                self.hardcode_samples_idx = (self.hardcode_samples_idx+1)%len(self._config['scene_name_1_list'])
+            self.first_sample_call = 0
 
         self.img1_pil = self._dataset.get_rgb_image_from_scene_name_and_idx(scene_name_1, image_1_idx)
         self.img2_pil = self._dataset.get_rgb_image_from_scene_name_and_idx(scene_name_2, image_2_idx)
