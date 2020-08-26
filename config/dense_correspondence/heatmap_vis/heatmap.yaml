@@ -8,7 +8,8 @@ different_objects: False
 multiple_object: False # sample from multi object scenes
 kernel_variance: 0.25
 networks:
-- "carla_3"
+# - "carla_3"
+- "carla_32"
 
 pickle_folder:
 - "/projects/katefgroup/datasets/shamit_carla_correct/npys/mc_don"
