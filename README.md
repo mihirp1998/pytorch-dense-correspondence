@@ -79,6 +79,8 @@ Conda env: denseobj
 TB and model dir: /projects/katefgroup/datasets/denseobj_clevr//pdc/code/data_volume/pdc/trained_models/tutorials/clevr_3
 ```
 
+See this commit on how to integrate a new dataset for training and evaluation:
+```https://github.com/mihirp1998/pytorch-dense-correspondence/commit/6b9c5113e661d111b111c3d5b3306f92b9e37330```
 
 1. Execute ```test/clevr_segmentation_mask_gen.py``` script in qnet_corres_entity branch or create similar script for your dataset
 
