@@ -3,14 +3,16 @@ params:
   num_matches_per_image_pair: 100
 
 networks:
-  carla_3:
-    path_to_network_params: trained_models/tutorials/carla_3/003501.pth
-  carla_32:
-    path_to_network_params: trained_models/tutorials/carla_32/005501.pth
+  # carla_3:
+  #   path_to_network_params: trained_models/tutorials/carla_3/003501.pth
+  # carla_32:
+  #   path_to_network_params: trained_models/tutorials/carla_32/005501.pth
+  clevr_3:
+    path_to_network_params: trained_models/tutorials/clevr_3/005501.pth
 
 dataset: [] # which dataset to use, not used for now
 
 output_dir: analysis
 
 pickle_folder:
-- "/projects/katefgroup/datasets/shamit_carla_correct/npys/mc_don"
+- "/projects/katefgroup/datasets/clevr_vqa/raw/npys/single_obj_large_480_don"

@@ -97,7 +97,7 @@ class HeatmapVisualization(object):
 
     def load_specific_dataset(self):
         dataset_config_filename = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence',
-                                            'dataset', 'composite', 'carla_4cars.yaml')
+                                            'dataset', 'composite', 'clevr_single_large.yaml')
 
         # dataset_config_filename = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config',
         #                                        'dense_correspondence',

@@ -224,7 +224,7 @@ class DenseCorrespondenceDataset(data.Dataset):
         """
         return ((len(tensor) == 1) and (tensor[0] == -1))
 
-    def get_rgbd_mask_pose(self, scene_name, img_idx, pickle_folder='/projects/katefgroup/datasets/shamit_carla_correct/npys/mc_don'):
+    def get_rgbd_mask_pose(self, scene_name, img_idx, pickle_folder='/projects/katefgroup/datasets/clevr_vqa/raw/npys/single_obj_large_480_don'):
         """
         Returns rgb image, depth image, mask and pose.
         :param scene_name:

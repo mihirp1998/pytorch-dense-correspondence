@@ -1,5 +1,8 @@
 import os
+
 import sys
+# sys.path.append("/home/mprabhud/projects/pytorch-dense-correspondence")
+
 from config.params import *
 import logging
 import matplotlib
@@ -11,7 +14,6 @@ os.environ['DC_SOURCE_DIR'] = DIR_PROJ
 os.environ['DC_DATA_DIR'] = "{}/pdc".format(DIR_DATA)
 
 
-# utils.add_dense_correspondence_to_python_path()
 
 import modules.dense_correspondence_manipulation.utils.utils as utils
 from dense_correspondence.training.training import *
@@ -31,7 +33,7 @@ class TrainingTutorial:
     def load_configuration(self):
         # config_filename = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence',
         config_filename = os.path.join(DIR_PROJ, 'config', 'dense_correspondence',
-                                       'dataset', 'composite', 'carla_4cars.yaml')
+                                       'dataset', 'composite', 'clevr_single_large.yaml')
         config = utils.getDictFromYamlFilename(config_filename)
         # train_config_file = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence',
         train_config_file = os.path.join(DIR_PROJ, 'config', 'dense_correspondence',
@@ -42,8 +44,8 @@ class TrainingTutorial:
 
         logging_dir = "code/data_volume/pdc/trained_models/tutorials"
         # num_iterations = 3500
-        descr_dim = 32  # the descriptor dimension
-        self.train_config["training"]["logging_dir_name"] = "carla_%d" % (descr_dim)
+        descr_dim = 3  # the descriptor dimension
+        self.train_config["training"]["logging_dir_name"] = "clevr_%d" % (descr_dim)
         self.train_config["training"]["logging_dir"] = logging_dir
         self.train_config["dense_correspondence_network"]["descriptor_dimension"] = descr_dim
         # self.train_config["training"]["num_iterations"] = num_iterations

@@ -1,0 +1,9 @@
+logs_root_path: logs_proto
+
+single_object_scenes_config_files:
+- clevr_single_large_train.yaml
+
+multi_object_scenes_config_files: []
+
+pickle_folder:
+- "/projects/katefgroup/datasets/clevr_vqa/raw/npys/single_obj_large_480_don"

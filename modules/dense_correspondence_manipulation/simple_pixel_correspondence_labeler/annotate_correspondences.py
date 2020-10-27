@@ -13,7 +13,7 @@ from dense_correspondence.dataset.spartan_dataset_masked import SpartanDataset, 
 # config_filename = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence', 
 #                                'dataset', 'composite', 'star_bot_front_only.yaml')
 config_filename = os.path.join(utils.getDenseCorrespondenceSourceDir(), 'config', 'dense_correspondence', 
-                               'dataset', 'composite', 'carla_4cars.yaml')
+                               'dataset', 'composite', 'clevr_single_large.yaml')
 config = utils.getDictFromYamlFilename(config_filename)
 sd = SpartanDataset(config=config)
 sd.set_train_mode()

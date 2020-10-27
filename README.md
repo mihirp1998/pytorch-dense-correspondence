@@ -65,3 +65,75 @@ If you find this code useful in your work, please consider citing:
 ### Git management
 
 To prevent the repo from growing in size, recommend always "restart and clear outputs" before committing any Jupyter notebooks.  If you'd like to save what your notebook looks like, you can always "download as .html", which is a great way to snapshot the state of that notebook and share.
+
+
+### Pytorch disco
+```
+source source.sh
+python dense_correspondence/training/training_tutorial.py
+```
+
+### Integrating a new pydisco dataset in this repo for training
+```
+Conda env: denseobj
+TB and model dir: /projects/katefgroup/datasets/denseobj_clevr//pdc/code/data_volume/pdc/trained_models/tutorials/clevr_3
+```
+
+
+1. Execute ```test/clevr_segmentation_mask_gen.py``` script in qnet_corres_entity branch or create similar script for your dataset
+
+2. Execute ```test/clevr_denseobjnet_dataset_creation.py``` script in qnet_corres_entity branch or create similar script for your dataset. Change stuff with 'change this for new dataset' written in 
+front of it.
+
+3. Change ```config/params.py```
+
+4. Change intrinsics in ```get_default_K_matrix```
+
+5. Change mean and variance in ```constants.py```
+
+6. Create config files like carla_4cars.yaml and carla_4cars_train.yaml. Run ```pickle_names_yaml_creator.py``` which will give you pickle files names which you can copy paste in _train.yaml file
+
+7. Change config_filename in ```training_tutorial.py```. Change ```self.train_config["training"]["logging_dir_name"]``` there too.
+
+8. Set ```descr_dim``` as required in training_tutorial.py
+
+9. Change image H and W in training.yaml
+
+10. Change default pickle folder path in ```get_rgbd_mask_pose``` in ```dense_correspondence_dataset_masked.py```
+
+11. Change image_height and image_width in DenseCorrespondenceNetwork
+
+12. If you get the pickle protocol=3 error, run ```pickle_protocol_changer.py script``` to chane pickle 
+files to protocol 2.
+
+
+### Integrating a new pydisco dataset in this repo for evaluation
+
+1. Change model_path and pickle_folder in evaluation.yaml
+
+2. Add model name in heatmap.yaml in networks and change pickle_folder there too
+
+3. Change model yaml in annotate_correspondence.py and live_heatmap_visualization.py
+
+
+### Live heatmap visualization
+
+ssh -Y mprabud@matrix.ml.cmu.edu 
+
+DON'T GO IN ANY SCREEN
+
+then ssh -Y compute-0-38
+
+then:
+
+cd /home/mprabhud/projects/pytorch-dense-correspondence
+
+source source.sh
+
+python modules/user-interaction-heatmap-visualization/live_heatmap_visualization.py
+
+then u can see the visualization on ur mac
+
+via the cluster
+
+ssh -Y is transfering the display ports to ur local pc

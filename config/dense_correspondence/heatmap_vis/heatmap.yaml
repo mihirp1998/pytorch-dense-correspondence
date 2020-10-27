@@ -9,14 +9,15 @@ multiple_object: False # sample from multi object scenes
 kernel_variance: 0.25
 networks:
 # - "carla_3"
-- "carla_32"
+# - "carla_32"
+- "clevr_3"
 
 pickle_folder:
-- "/projects/katefgroup/datasets/shamit_carla_correct/npys/mc_don"
+- "/projects/katefgroup/datasets/clevr_vqa/raw/npys/single_obj_large_480_don"
 
 do_pca: True
 
-hardcode_samples: True
+hardcode_samples: False
 scene_name_1_list:
 - "15885529876821635"
 - "15885530311595225"
