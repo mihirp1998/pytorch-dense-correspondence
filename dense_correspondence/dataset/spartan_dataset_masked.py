@@ -377,7 +377,7 @@ class SpartanDataset(DenseCorrespondenceDataset):
         # @todo(manuelli) check that scene_name actually exists
 
         scene_directory = self.get_full_path_for_scene(scene_name)
-
+        # st()
         if image_type == ImageType.RGB:
             images_dir = os.path.join(scene_directory, 'images')
             file_extension = "_rgb.png"

@@ -7,7 +7,8 @@ import logging
 import dense_correspondence_manipulation.utils.utils as utils
 utils.add_dense_correspondence_to_python_path()
 
-
+import ipdb
+st = ipdb.set_trace
 from PIL import Image
 
 import torch
@@ -513,10 +514,31 @@ class DenseCorrespondenceNetwork(nn.Module):
         # for i in xrange(0, height):
         #     for j in xrange(0, width):
         #         norm_diffs[i,j] = np.linalg.norm(res_b[i,j] - descriptor_at_pixel)**2
+        distance = "cosine"
+        if distance == "cosine":
+            res_b_shape = res_b.shape
+            res_b = res_b.reshape([-1,res_b.shape[-1]])
+            res_b_norm =  np.expand_dims(np.linalg.norm(res_b,axis=-1),axis=-1)
+            descriptor_at_pixel = np.expand_dims(descriptor_at_pixel,axis=-1)
+            descriptor_at_pixel_norm = np.linalg.norm(descriptor_at_pixel,axis=0)
+            similarity = np.matmul(res_b,descriptor_at_pixel)
+            similarity = similarity/(res_b_norm+1e-5)
+            similarity = similarity/(descriptor_at_pixel_norm+1e-5)
+            norm_diffs = similarity.reshape(res_b_shape[:2])
+            best_match_flattened_idx = np.argmax(norm_diffs)
+        else:
+            norm_diffs = np.sqrt(np.sum(np.square(res_b - descriptor_at_pixel), axis=2))
+            norm_diffs = (norm_diffs)
+            best_match_flattened_idx = np.argmin(norm_diffs)
+        # st()
 
-        norm_diffs = np.sqrt(np.sum(np.square(res_b - descriptor_at_pixel), axis=2))
+        # index_query_feat_norm = index_query_feat.norm(dim=-1)
+        # target_feat_flat_norm = target_feat_flat.norm(dim=0, keepdim=True)
+        # similarity = index_query_feat @ target_feat_flat # torch.Size([1, 373248]
+        # similarity = similarity/(index_query_feat_norm + 1e-5)
+        # similarity = similarity/(target_feat_flat_norm + 1e-5)
+        # similarity = similarity.reshape(Z2, Y2, X2)        
 
-        best_match_flattened_idx = np.argmin(norm_diffs)
         best_match_xy = np.unravel_index(best_match_flattened_idx, norm_diffs.shape)
         best_match_diff = norm_diffs[best_match_xy]
 

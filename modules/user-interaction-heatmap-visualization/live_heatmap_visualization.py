@@ -185,24 +185,17 @@ class HeatmapVisualization(object):
         else:
             self._dataset.set_test_mode()
 
-        if self._config["same_object"]:
-            scene_name_1, scene_name_2, image_1_idx, image_2_idx = self.get_random_image_pair()
-        elif self._config["different_objects"]:
-            scene_name_1, scene_name_2, image_1_idx, image_2_idx = self.get_random_image_pair_across_object()
-        elif self._config["multiple_object"]:
-            scene_name_1, scene_name_2, image_1_idx, image_2_idx = self.get_random_image_pair_multi_object_scenes()
+
+        if not self._config['hardcode_samples']:
+            if self._config["same_object"]:
+                scene_name_1, scene_name_2, image_1_idx, image_2_idx = self.get_random_image_pair()
+            elif self._config["different_objects"]:
+                scene_name_1, scene_name_2, image_1_idx, image_2_idx = self.get_random_image_pair_across_object()
+            elif self._config["multiple_object"]:
+                scene_name_1, scene_name_2, image_1_idx, image_2_idx = self.get_random_image_pair_multi_object_scenes()
+            else:
+                raise ValueError("At least one of the image types must be set tot True")
         else:
-            raise ValueError("At least one of the image types must be set tot True")
-
-
-        # caterpillar
-        # scene_name_1 = "2018-04-16-14-42-26"
-        # scene_name_2 = "2018-04-16-14-25-19"
-
-        # hats
-        # scene_name_1 = "2018-05-15-22-01-44"
-        # scene_name_2 = "2018-05-15-22-04-17"
-        if self._config['hardcode_samples']:
             scene_name_1 = self._config['scene_name_1_list'][self.hardcode_samples_idx]
             scene_name_2 = self._config['scene_name_2_list'][self.hardcode_samples_idx]
             image_1_idx = self._config['image_1_idx_list'][self.hardcode_samples_idx]
@@ -227,6 +220,9 @@ class HeatmapVisualization(object):
 
         # self.rgb_1_tensor = self._dataset.rgb_image_to_tensor(img1_pil)
         # self.rgb_2_tensor = self._dataset.rgb_image_to_tensor(img2_pil)
+    def showZoom(self,textWindow,tensor):
+        tensor = cv2.resize(tensor, (512, 512)) 
+        cv2.imshow(textWindow, tensor)
 
 
     def _compute_descriptors(self):
@@ -242,8 +238,8 @@ class HeatmapVisualization(object):
         self.img1_gray = cv2.cvtColor(self.img1, cv2.COLOR_RGB2GRAY) / 255.0
         self.img2_gray = cv2.cvtColor(self.img2, cv2.COLOR_RGB2GRAY) / 255.0
         # st()
-        cv2.imshow('source', self.img1)
-        cv2.imshow('target', self.img2)
+        self.showZoom('source', self.img1)
+        self.showZoom('target', self.img2)
 
         self._res_a = dict()
         self._res_b = dict()
@@ -251,9 +247,16 @@ class HeatmapVisualization(object):
             self._res_a[network_name] = dcn.forward_single_image_tensor(self.rgb_1_tensor).data.cpu().numpy()
             self._res_b[network_name] = dcn.forward_single_image_tensor(self.rgb_2_tensor).data.cpu().numpy()
         # st()
+        fname = os.path.join(self.pickle_path, self._scene_name_1 + '.p')
 
+        pfile1 = pickle.load(open(fname, 'rb'))
+        self.segment1 = pfile1['segment_camXs_raw'][self._image_1_idx].transpose(1,2,0)
+
+        fname = os.path.join(self.pickle_path, self._scene_name_2 + '.p')
+        pfile2 = pickle.load(open(fname,'rb'))
+        self.segment2 = pfile2['segment_camXs_raw'][self._image_2_idx].transpose(1,2,0)
         if self._config['do_pca']:
-            fname = os.path.join(self.pickle_path, self._scene_name_1 + '.p')
+
             pfile1 = pickle.load(open(fname, 'rb'))
             segment1 = pfile1['segment_camXs_raw'][self._image_1_idx].transpose(1,2,0)
 
@@ -279,7 +282,7 @@ class HeatmapVisualization(object):
             # st()
             # aa=1
 
-        self.find_best_match(None, 0, 0, None, None)
+        self.find_best_match()
 
     def scale_norm_diffs_to_make_heatmap(self, norm_diffs, threshold):
         """
@@ -302,7 +305,7 @@ class HeatmapVisualization(object):
         heatmap = heatmap.astype(self.img1_gray.dtype)
         return heatmap
 
-    def find_best_match(self, event,u,v,flags,param):
+    def find_best_match(self):
 
         """
         For each network, find the best match in the target image to point highlighted
@@ -310,12 +313,24 @@ class HeatmapVisualization(object):
         :return:
         :rtype:
         """
+        # st()
 
+        f = open("/home/mihir/storednums.txt", "r")
+        val = f.read()
+        val = val.split("_")        
+        try:
+            u = int(val[0])
+            v = int(val[1])
+        except Exception as e:
+            return
         if self._paused:
             return
+        print((u,v))
+        # st()
 
         img_1_with_reticle = np.copy(self.img1)
-        draw_reticle(img_1_with_reticle, u, v, self._reticle_color)
+        img_1_with_reticle = cv2.resize(img_1_with_reticle, (512, 512)) 
+        draw_reticle(img_1_with_reticle, u*2, v*2, self._reticle_color)
         cv2.imshow("source", img_1_with_reticle)
 
         alpha = self._config["blend_weight_original_image"]
@@ -334,6 +349,8 @@ class HeatmapVisualization(object):
         for network_name in self._dcn_dict:
             res_a = self._res_a[network_name]
             res_b = self._res_b[network_name]
+            # st()
+            res_b = self.segment2*res_b
             best_match_uv, best_match_diff, norm_diffs = \
                 DenseCorrespondenceNetwork.find_best_match((u, v), res_a, res_b)
             print "\n\n"
@@ -367,28 +384,38 @@ class HeatmapVisualization(object):
             threshold = self._config["norm_diff_threshold"]
             if network_name in self._config["norm_diff_threshold_dict"]:
                 threshold = self._config["norm_diff_threshold_dict"][network_name]
-
-            heatmap_color = vis_utils.compute_gaussian_kernel_heatmap_from_norm_diffs(norm_diffs, self._config['kernel_variance'])
-
+            ours = False
+            # st()
+            norm_diffs = self.segment2[:,:,0]*norm_diffs + (np.abs(self.segment2[:,:,0]-1)*np.max(norm_diffs))
+            if ours:
+                heatmap_color = norm_diffs +1.1
+                heatmap_color = vis_utils.grayscale_to_heatmap("Correspondence/Heatmap_cycle", heatmap_color, scheme="jet", min_val=1.5, max_val=2.1, only_return=True, normalize_using_data_stats=True)
+                # heatmap_color = cv2.cvtColor(heatmap_color,cv2.COLOR_RGB2BGR)
+            else:
+                heatmap_color = vis_utils.compute_heatmap_from_norm_diffs(norm_diffs, self._config['kernel_variance'])
+            # st()
+            heatmap_color = self.segment2.astype(np.uint8)*heatmap_color
             reticle_color = self._network_reticle_color[network_name]
-
-            draw_reticle(heatmap_color, best_match_uv[0], best_match_uv[1], reticle_color)
-            draw_reticle(img_2_with_reticle, best_match_uv[0], best_match_uv[1], reticle_color)
+            # st()
+            # draw_reticle(heatmap_color, best_match_uv[0], best_match_uv[1], reticle_color)
+            img_2_with_reticle = cv2.resize(img_2_with_reticle, (512, 512)) 
+            draw_reticle(img_2_with_reticle, best_match_uv[0]*2, best_match_uv[1]*2, reticle_color)
             blended = cv2.addWeighted(self.img2, alpha, heatmap_color, beta, 0)
-            cv2.imshow(network_name, blended)
+            self.showZoom(network_name, blended)
 
         cv2.imshow("target", img_2_with_reticle)
-        if event == cv2.EVENT_LBUTTONDOWN:
-            utils.saveToYaml(self._res_uv, 'clicked_point.yaml')
+        # if event == cv2.EVENT_LBUTTONDOWN:
+        #     utils.saveToYaml(self._res_uv, 'clicked_point.yaml')
 
     def run(self):
         self._get_new_images()
         cv2.namedWindow('target')
-        cv2.setMouseCallback('source', self.find_best_match)
+        # cv2.setMouseCallback('source', self.find_best_match)
 
         self._get_new_images()
 
         while True:
+            self.find_best_match()
             k = cv2.waitKey(20) & 0xFF
             if k == 27:
                 break
