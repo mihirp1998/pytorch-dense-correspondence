@@ -41,12 +41,12 @@ class TrainingTutorial:
         # st()
 
         logging_dir = "code/data_volume/pdc/trained_models/tutorials"
-        num_iterations = 3500
-        descr_dim = 3  # the descriptor dimension
+        # num_iterations = 3500
+        descr_dim = 32  # the descriptor dimension
         self.train_config["training"]["logging_dir_name"] = "carla_%d" % (descr_dim)
         self.train_config["training"]["logging_dir"] = logging_dir
         self.train_config["dense_correspondence_network"]["descriptor_dimension"] = descr_dim
-        self.train_config["training"]["num_iterations"] = num_iterations
+        # self.train_config["training"]["num_iterations"] = num_iterations
 
 
     def train(self):

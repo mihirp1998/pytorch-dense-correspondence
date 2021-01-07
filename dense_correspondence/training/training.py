@@ -51,6 +51,7 @@ class DenseCorrespondenceTraining(object):
             config = DenseCorrespondenceTraining.load_default_config()
 
         self._config = config
+        # st()
         self._dataset = dataset
         self._dataset_test = dataset_test
 
@@ -343,6 +344,7 @@ class DenseCorrespondenceTraining(object):
                 image_a_pred = dcn.process_network_output(image_a_pred, batch_size)
 
                 image_b_pred = dcn.forward(img_b)
+                # st()
                 image_b_pred = dcn.process_network_output(image_b_pred, batch_size)
 
                 # get loss
@@ -476,7 +478,7 @@ class DenseCorrespondenceTraining(object):
         :return: full path of logging dir
         :rtype: str
         """
-
+        # st()
         if 'logging_dir_name' in self._config['training']:
             dir_name = self._config['training']['logging_dir_name']
         else:

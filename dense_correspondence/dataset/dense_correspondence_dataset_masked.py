@@ -236,6 +236,7 @@ class DenseCorrespondenceDataset(data.Dataset):
         """
         # st()
         pickle_name = os.path.join(pickle_folder, scene_name+".p")
+        # print("pickle name: ", pickle_name)
         p = pickle.load(open(pickle_name, 'rb'))
 
         rgb_file = self.get_image_filename(scene_name, img_idx, ImageType.RGB)
